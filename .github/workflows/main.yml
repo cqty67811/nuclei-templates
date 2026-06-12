@@ -1,7 +1,7 @@
 # .github/workflows/sync-nuclei-zip.yml
 on:
   schedule:
-    - cron: '0 6 * * 0'  
+    - cron: '0 6 * * *'  # 每天UTC 6点执行
   workflow_dispatch:       # 也支持手动触发
 
 jobs:
