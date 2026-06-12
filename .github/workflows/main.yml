@@ -1,29 +1,29 @@
-name: Sync nuclei-templates to Gitee
-
+# .github/workflows/sync-nuclei-zip.yml
 on:
   schedule:
-    - cron: '0 3 * * 0'
-  workflow_dispatch:
+    - cron: '0 6 * * 0'  
+  workflow_dispatch:       # 也支持手动触发
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout GitHub nuclei-templates
+        run: git clone --depth 1 https://github.com/projectdiscovery/nuclei-templates
 
-      - name: Sync upstream and push to Gitee
+      - name: Create zip (only needed dirs)
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cd nuclei-templates
+          zip -r nuclei-templates.zip http/ network/ dns/ ssl/ file/ code/
 
-          git remote add upstream https://github.com/projectdiscovery/nuclei-templates.git
-          git fetch upstream main
-
-          git checkout main
-          git merge upstream/main --no-edit || git merge upstream/main --no-edit -X ours
-
-          git remote add gitee https://ksaliang:${{ secrets.GITEE_TOKEN }}@gitee.com/ksaliang/nuclei-templates.git
-          git push gitee main --force
+      - name: Push zip to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          git clone https://ksaliang:${GITEE_TOKEN}@gitee.com/ksaliang/nuclei-templates.git gitee-repo
+          cp nuclei-templates/nuclei-templates.zip gitee-repo/
+          cd gitee-repo
+          git config user.name "bot"
+          git config user.email "bot@example.com"
+          git add nuclei-templates.zip
+          git diff --cached --quiet || git commit -m "update nuclei-templates.zip" && git push
