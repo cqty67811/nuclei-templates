@@ -14,7 +14,7 @@ jobs:
       - name: Create zip (only needed dirs)
         run: |
           cd nuclei-templates
-          zip -r nuclei-templates.zip http/ network/ dns/ ssl/ file/ code/
+          zip -r nuclei-templates.zip http/ network/ dns/ ssl/ file/ code/ javascript/ headless/ dast/
 
       - name: Push zip to Gitee
         env:
